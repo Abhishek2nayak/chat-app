@@ -4,7 +4,7 @@ import io, { Socket } from "socket.io-client"
 import Home from "./pages/Home"
 import ChatRoom from "./pages/ChatRoom"
 
-const socket: Socket = io('http://localhost:8080');
+const socket: Socket = io('https://chat-app-8jyb.onrender.com/');
 
 socket.onAny((eventName, ...args) => {
   console.log(`Received event '${eventName}' with data:`, ...args);
