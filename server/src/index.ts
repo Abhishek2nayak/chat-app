@@ -40,11 +40,9 @@ const httpServer = createServer(app);
 const chatRoom = new ChatRoom();
 const io = new Server(httpServer, {
     cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"],
-        allowedHeaders: ["Content-Type"],
-        credentials: true
-    },
+    origin: "https://chatapp26-git-main-abhishek2nayaks-projects.vercel.app",
+    methods: ["GET", "POST"]
+  }
 });
 
 
