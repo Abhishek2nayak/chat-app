@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://chatdb_owner:dL8zI4CaUOuf@ep-holy-dew-a1x53xpc.ap-southeast-1.aws.neon.tech/chatdb?sslmode=require"
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  password     String
+  avatar       String?
+  createdRooms Room[]     @relation("RoomCreator")
+  roomMembers  RoomUser[]
+  messages     Message[]  @relation("MessageSender")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  sender    User     @relation("MessageSender", fields: [senderId], references: [id])
+  senderId  String
+  content   String
+  timestamp DateTime @default(now())
+  room      Room     @relation(fields: [roomId], references: [id])
+  roomId    String
+}
+
+model Room {
+  id          String     @id @default(cuid())
+  name        String
+  creator     User       @relation("RoomCreator", fields: [creatorId], references: [id])
+  creatorId   String
+  avatar      String?
+  messages    Message[]
+  createdTime DateTime   @default(now())
+  activeUsers Int
+  users       RoomUser[]
+}
+
+model RoomUser {
+  userId String
+  roomId String
+  user   User   @relation(fields: [userId], references: [id])
+  room   Room   @relation(fields: [roomId], references: [id])
+
+  @@id([userId, roomId])
+}

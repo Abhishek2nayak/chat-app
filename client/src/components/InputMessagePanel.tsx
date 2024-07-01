@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { Socket } from "socket.io-client";
+import { useState, useEffect, useContext } from "react";
+import { SocketContext } from "../App";
 
-const InputMessage = ({socket} : {socket : Socket}) => {
+const InputMessage = () => {
     const [inputMessage, setInputMessage] = useState('');
-
+    const socket = useContext(SocketContext) 
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
             if (event.key === 'Enter') {
@@ -15,7 +15,7 @@ const InputMessage = ({socket} : {socket : Socket}) => {
 
     const handleSendMessage = () => {
         if(inputMessage !== '') {
-            socket.emit("SEND_MESSAGE",{message : inputMessage})
+            socket?.emit("SEND_MESSAGE",{message : inputMessage})
         }
     }
 

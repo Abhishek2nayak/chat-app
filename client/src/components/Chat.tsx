@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
-import Message from "./Message";
+import { useContext, useEffect, useRef, useState } from "react";
+import Message from "./MessageBubble";
+import { SocketContext, URL } from "../App";
 
 interface ChatProps {
-    socket: Socket,
+    // socket: Socket,
     username: string,
 }
 
@@ -15,22 +15,22 @@ export interface IMessage {
     time: number
 }
 
-export default function Chat({ socket, username }: ChatProps) {
-
+export default function Chat({ username }: ChatProps) {
     const [messages, setMessages] = useState<IMessage[]>([]);
     const chatContainerRef = useRef<HTMLDivElement>(null);
+    const socket = useContext(SocketContext);
 
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
 
     useEffect(() => {
-        socket.on("RECIEVE_MESSAGE", (data: IMessage[]) => {
+        socket?.on("RECIEVE_MESSAGE", (data: IMessage[]) => {
             setMessages(data);
         });
 
         return () => {
-            socket.off("RECIEVE_MESSAGE");
+            socket?.off("RECIEVE_MESSAGE");
         };
     }, [socket]);
 
