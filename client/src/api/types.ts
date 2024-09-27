@@ -1,3 +1,5 @@
+import { Room } from "../types";
+
 export type Gender =  "male" | "female" | "other";
 
 export type User = {
@@ -7,10 +9,15 @@ export type User = {
     gender : Gender
 }
 
-
-
 export type AlertState = {
     message: string | null;
     type: 'success' | 'error' | 'info' | 'warning';
   }
-  
+
+export type RoomDetails = {
+    room: Room;
+    roomId: string;
+    userId: string;
+}
+
+

@@ -1,19 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import Message from "./MessageBubble";
-import { SocketContext, URL } from "../App";
-
-interface ChatProps {
-    // socket: Socket,
-    username: string,
-}
-
-export interface IMessage {
-    id: string;
-    message: string;
-    sender: string;
-    room: string;
-    time: number
-}
+import Message from "../MessagePanel";
+import { SocketContext} from "../../App";
+import { ChatProps } from "./types";
 
 export default function Chat({ username }: ChatProps) {
     const [messages, setMessages] = useState<IMessage[]>([]);

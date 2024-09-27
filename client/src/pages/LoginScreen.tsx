@@ -19,7 +19,7 @@ const Login: React.FC = () => {
             setAlert({ message: "login successfully", type: "success" });
             localStorage.setItem('chat-token',res.token);
             setTimeout(() => {
-                navigate('/home')
+                navigate('/')
             }, 3000)
         } catch (error: any) {
             const errorResponse = error.response;

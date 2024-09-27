@@ -1,14 +1,8 @@
-// src/Alert.tsx
 import React, { useEffect } from 'react';
-
-interface AlertProps {
-  message: string;
-  type: 'success' | 'error' | 'info' | 'warning';
-  onClose: () => void;
-}
+import { AlertProps, AlertTypeClasses } from './types';
 
 const Alert: React.FC<AlertProps> = ({ message, type, onClose }) => {
-  const alertTypeClasses = {
+  const alertTypeClasses: AlertTypeClasses = {
     success: 'alert-success',
     error: 'alert-error',
     info: 'alert-info',
@@ -18,7 +12,7 @@ const Alert: React.FC<AlertProps> = ({ message, type, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 5000); // Auto close after 5 seconds
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, [onClose]);
@@ -32,7 +26,7 @@ const Alert: React.FC<AlertProps> = ({ message, type, onClose }) => {
         <label>{message}</label>
       </div>
       <button className="btn btn-sm btn-ghost" onClick={onClose}>
-        ✕
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
       </button>
     </div>
   );
