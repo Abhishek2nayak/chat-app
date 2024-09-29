@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, Suspense, useContext, useEffect, useState } from "react";
 import { SocketContext } from "../App";
 import Alert from "../components/Alert";
 import useRooms from "../hooks/useRooms";
@@ -7,6 +7,7 @@ import RoomCard from "../components/Card/RoomCard";
 import Loading from "../components/Loader";
 import useUserJoinedRoom from "../hooks/useUserRooms";
 import useDebounce from "../hooks/useDebounce";
+import { NavLink } from "react-router-dom";
 
 type FilteredOptions = "all" | "joined" | "not_joined";
 
@@ -17,7 +18,9 @@ export default function Home() {
     const [joinedRoom, setJoinedRoom] = useState<string[]>([]);
     const { userRooms } = useUserJoinedRoom(socket);
     const [query, setQuery] = useState("");
-    const debounceSearch = useDebounce(query, 100);;
+    const debounceSearch = useDebounce(query, 100);
+
+
     useEffect(() => {
         if (rooms.length === 0 || userRooms.length === 0) return;
 
@@ -27,7 +30,6 @@ export default function Home() {
 
         setJoinedRoom(prevJoinedRooms => [...prevJoinedRooms, ...newJoinedRoomIds]);
     }, [userRooms, rooms]);
-
 
     const joinRoom = (roomId: string) => {
         if (!roomId || !socket?.connected) {
@@ -61,6 +63,8 @@ export default function Home() {
     return (
         <div className="flex justify-center p-6">
             <div className="w-[80vw]">
+            <NavLink className="btn btn-primary mb-5 float-right"
+                to={'/room'}>Go to Chat Room</NavLink>
                 {error && <Alert type="error" message={error} />}
                 <div className="available-rooms-wrapper">
                     <h1 className="text-3xl font-bold">Search Rooms</h1>
@@ -103,17 +107,19 @@ export default function Home() {
                     <div className="w-full h-[1px] bg-gray-600 rounded mt-2 mb-5"></div>
                     {loading && <Loading />}
                     <div className="grid grid-cols-4 h-[500px] gap-5 overflow-auto">
-                        {filteredRooms.map((room: RoomState) => (
-                            <RoomCard
-                                key={room.id}
-                                joined={joinedRoom.includes(room.id)}
-                                id={room.id}
-                                name={room.name}
-                                avatar={room.avatar}
-                                createdTime={room.createdTime}
-                                onSelected={joinRoom}
-                            />
-                        ))}
+                        <Suspense fallback={"We are updating your data please wait..."}>
+                            {filteredRooms.map((room: RoomState) => (
+                                <RoomCard
+                                    key={room.id}
+                                    joined={joinedRoom.includes(room.id)}
+                                    id={room.id}
+                                    name={room.name}
+                                    avatar={room.avatar}
+                                    createdTime={room.createdTime}
+                                    onSelected={joinRoom}
+                                />
+                            ))}
+                        </Suspense>
                     </div>
                 </div>
             </div>

@@ -1,10 +1,9 @@
-import { TRoom } from "../../types";
+import { Socket } from "socket.io-client";
 
 export type ChatProps = {
     username: string,
 }
 
 export type TRoomPanelProps = {
-    rooms: TRoom[],
-    onRoomClick: (id: string) => void;
+   socket : null | Socket
 }

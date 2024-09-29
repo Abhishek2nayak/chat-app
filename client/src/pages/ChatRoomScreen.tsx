@@ -1,10 +1,14 @@
 
+import { useOutletContext, useParams } from 'react-router-dom';
 import UserPanel from '../components/ChatPanel/UserPanel';
 import InputMessage from '../components/InputMessage';
 import MessagesPanel from '../components/MessagePanel';
-import { dummyUsers } from '../utils/dummyData';
+
+import { Socket } from 'socket.io-client';
 
 export default function ChatRoom() {
+    const socket: Socket | null = useOutletContext();
+    const params = useParams<{ id: string }>();
 
     return (
 
@@ -12,7 +16,10 @@ export default function ChatRoom() {
             <div className='w-full h-full flex'>
                 {/* User pannel */}
                 <div style={{ width: "200px" }} className='h-full' >
-                    <UserPanel users={dummyUsers} onLeaveButtonClick={() => console.log("first")} roomId={"1"} />
+                    <UserPanel
+                        roomId={params.id}
+                        socket={socket}
+                    />
                 </div>
                 {/* Chat Screen */}
                 <div style={{ width: "calc(100% - 200px)" }} className='bg-slate-800 h-full flex flex-col'>

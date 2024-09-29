@@ -74,7 +74,8 @@ export class Room {
             await prisma.roomUser.create({
                 data: {
                     userId: userId,
-                    roomId: this.id
+                    roomId: this.id,
+                    isActive : true,
                 }
             });
 

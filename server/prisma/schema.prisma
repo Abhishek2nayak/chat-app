@@ -47,10 +47,11 @@ model Room {
 }
 
 model RoomUser {
-  userId String
-  roomId String
-  user   User   @relation(fields: [userId], references: [id])
-  room   Room   @relation(fields: [roomId], references: [id])
+  userId   String
+  isActive Boolean
+  roomId   String
+  user     User    @relation(fields: [userId], references: [id])
+  room     Room    @relation(fields: [roomId], references: [id])
 
   @@id([userId, roomId])
 }

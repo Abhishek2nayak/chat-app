@@ -1,15 +1,35 @@
 import { Request, Response } from "express";
-import prisma from "../client";
+import { User } from "../model/user.model";
+import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
 
 export const getRooms = async (req: Request, res: Response) => {
     try {
-        const rooms = await prisma.room.findMany();
-        return res.status(200).json({ rooms });
+        const rooms = await prisma.room.findMany({
+            include: {
+                creator: { select: { id: true, name: true,avatar : true } }, // Adjust as needed
+                users: { // Adjust based on your schema
+                    select: {
+                        userId : true,
+                    }
+                }
+            }
+        });
+
+        // Add user count for each room
+        const roomsWithUserCount = rooms.map(room => ({
+            ...room,
+            userCount: room.users.length
+        }));
+
+        return res.status(200).json({ rooms: roomsWithUserCount });
     } catch (error: any) {
+        console.error(error);
         return res.status(400).json({ error: "Failed fetching rooms" });
     }
-}
+};
+
 
 export const createRoom = async (req : Request, res: Response) => {
     try {
@@ -29,26 +49,23 @@ export const createRoom = async (req : Request, res: Response) => {
     }
 }
 
-
-
-// export const getUserRooms = async (req: Request, res: Response) => {
-//     try {
-//         const userId = (req as any).userId;
-//         const rooms = await prisma.roomUser.findMany({
-//             where :  {
-//                 userId : userId,
-//             },
-//             include : {
-//                 room : true,
-//             }
-//         });
+export const getUserRooms = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).userId;
+        const rooms = await prisma.roomUser.findMany({
+            where :  {
+                userId : userId,
+            },
+            include : {
+                room : true,
+            }
+        });
         
-
-//         return res.status(200).json({ rooms });
-//     } catch (error: any) {
-//         return res.status(400).json({ error: "Failed fetching rooms" });
-//     }
-// }
+        return res.status(200).json({ rooms });
+    } catch (error: any) {
+        return res.status(400).json({ error: "Failed fetching rooms" });
+    }
+}
 
 // export const assignRoom = async(req : Request, res : Response) => {
 //     try {

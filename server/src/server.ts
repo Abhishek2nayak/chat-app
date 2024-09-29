@@ -40,6 +40,7 @@ export class Server {
     public configureApp() {
         this.processRequest();
         this.app.use('/app', appRoute);
+        
     }
 
     public handleSocketConnection() {

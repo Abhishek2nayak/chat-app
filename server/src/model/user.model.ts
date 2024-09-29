@@ -30,8 +30,6 @@ export class User {
         return new User(user.id, user.name, user.email, user.password, user.avatar);
     }
 
-    //static method to create new user
-
     static async createUser(name: string, email: string, password: string): Promise<User> {
         const user = await prisma.user.create({
             data: { name, email, password, avatar: AVATAR_API_BASE_URL + email }
@@ -39,6 +37,7 @@ export class User {
 
         return new User(user.id, user.name, user.email, user.password, user.avatar);
     }
+
 
     //static function to get the room joined by the user;
 
