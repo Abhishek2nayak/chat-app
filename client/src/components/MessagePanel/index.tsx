@@ -1,48 +1,55 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { TMessage } from "../../types";
+import { TAdaptedMessage } from "./types";
 import { SocketContext } from "../../App";
-import { TAdaptedMessage, TMessagesCallbackResponse } from "./types";
 import Message from "./Message";
+import useRoomMessage from "../../hooks/useRoomMessage";
+import useJoinRoom from "../../hooks/useJoinRoom";
 
-const MessagesPanel = () => {
-    const [messages, setMessages] = useState<TAdaptedMessage[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+const MessagesPanel: React.FC = () => {
     const socket = useContext(SocketContext);
-    const params = useParams<{ id: string }>();
+    const { id: roomId } = useParams<{ id: string }>();
+    const { messages, loading, error } = useRoomMessage(roomId, socket);
+    const [adaptedMessages, setAdaptedMessages] = useState<TAdaptedMessage[]>([]);
+    const user = useJoinRoom(roomId);
+
+    const messageAdapter = useCallback((apiMessages: TMessage[]): TAdaptedMessage[] => {
+        return apiMessages.map(({ id, content, sender, timestamp, roomId }) => ({
+            id,
+            content,
+            sender,
+            timestamp,
+            roomId
+        }));
+    }, []);
 
     useEffect(() => {
-        setIsLoading(true);
-        socket?.emit("GET_MESSAGES", params.id, (response: TMessagesCallbackResponse) => {
-            setIsLoading(false);
-            if (response.success) {
-                setMessages(messageAdapter(response.messages));
-            } else {
-                setError(response.error);
-                console.error("Failed to fetch messages:", response.error);
-            }
-        });
-        
-        // append new message  to the message array
-        socket?.on("new_message", (newMessage : TMessage) => {
-          setMessages([...messages,messageAdapter([newMessage])[0]]);
-        })
-    }, [params.id, socket]);
+        if (messages.length > 0) {
+            setAdaptedMessages(messageAdapter(messages));
+        }
+    }, [messages, messageAdapter]);
 
-    function messageAdapter(apiMessages: Array<TMessage>): TAdaptedMessage[] {
-        return apiMessages.map((message) => {
-            return {
-                id: message.id,
-                content: message.content,
-                sender: message.sender,
-                timestamp: message.timestamp,
-                roomId: message.roomId
-            }
-        })
-    }
+    useEffect(() => {
+        console.log(socket)
+        if (!socket) return;
 
-    if (isLoading) {
+        const handleNewMessage = (response: TMessage) => {
+            console.log("New message received:", response);
+            setAdaptedMessages(prevMessages => [
+                ...prevMessages,
+                messageAdapter([response])[0]
+            ]);
+        };
+
+        socket.on("new_message", handleNewMessage);
+
+        return () => {
+            socket.off("new_message", handleNewMessage);
+        };
+    }, [socket, messageAdapter]);
+
+    if (loading) {
         return <div>Loading...</div>;
     }
 
@@ -51,15 +58,19 @@ const MessagesPanel = () => {
     }
 
     return (
-        <>
-
-            {
-                messages.map((message: TAdaptedMessage) => (
-                    <Message message={message.content} sender={message.sender} timestamp={message.timestamp} id={message.id} align="end" />
-                ))
-            }
-        </>
+        <div className="messages-panel">
+            {adaptedMessages.map((message: TAdaptedMessage) => (
+                <Message
+                    key={message.id}
+                    message={message.content}
+                    sender={message.sender}
+                    timestamp={message.timestamp}
+                    id={message.id}
+                    align="end"
+                />
+            ))}
+        </div>
     );
-}
+};
 
 export default MessagesPanel;

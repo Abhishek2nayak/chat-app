@@ -5,14 +5,16 @@ import { useParams } from "react-router-dom";
 const InputMessage = () => {
     const [inputMessage, setInputMessage] = useState('');
     const socket = useContext(SocketContext);
-    const params = useParams();
+    const params = useParams<{ id: string }>();
 
     const handleSendMessage = () => {
-        if (inputMessage !== '') {
-            socket?.emit("ADD_MESSAGE",
-                { content: inputMessage, roomId: params.id, timestamp: Date.now() },
+        if (inputMessage !== '' || params.id) {
+            socket?.emit("send_message",
+                inputMessage, params.id,
                 (response: { success: boolean, message?: string, room?: string }) => {
-                    console.log(response);
+                   if(response.success) {
+                    setInputMessage('');
+                   }
                 }
             );
 

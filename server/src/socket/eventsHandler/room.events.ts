@@ -29,8 +29,8 @@ export class RoomEventHandler {
     this.socket.on("join_room", ({ roomId }, callback) => this.handleJoinRoom(roomId, callback));
     this.socket.on("leave_room", ({ callback }) => this.handleLeaveRoom(callback));
     this.socket.on("get_room_users", (roomId, callback) => this.getTheRoomUsers(roomId , callback));
-    this.socket.on("get_room_messages", (callback) => this.getTheRoomMessages(callback));
-    this.socket.on("send_message", ({ message, callback }) => this.handleSendMessage(message, callback));
+    this.socket.on("get_room_messages",( roomId,callback) => this.getTheRoomMessages(roomId, callback));
+    this.socket.on("send_message", ( message, roomId , callback ) => this.handleSendMessage(message,roomId, callback));
     this.socket.on("get_user_joined_rooms", (callback) => this.getUserJoinedRooms(callback));
 
     //     // TODO
@@ -143,10 +143,11 @@ export class RoomEventHandler {
     }
   }
 
-  async getTheRoomMessages(callback: (response: TGetRoomMessagesCallbackResponse) => void) {
-    if (!this.roomId) return;
+  async getTheRoomMessages(roomId : string , callback: (response: TGetRoomMessagesCallbackResponse) => void) {
+
     try {
-      const messages = await Message.getRoomMessages(this.roomId);
+      const messages = await Message.getRoomMessages(roomId);
+      console.log("I am getting new messages", messages)
       callback({ success: true, message: "get message successfully", data: messages });
     } catch (error: any) {
       callback({ success: false, data: null, message: "Error to getting room message" });
@@ -157,7 +158,6 @@ export class RoomEventHandler {
     console.log("dddd",roomId)
     try {
       const roomUsers = await Room.getRoomUsers(roomId);
-      console.log("________");
       console.log(roomUsers)
       callback({ success: true, message: "get users successfully", data: roomUsers });
     } catch (error: any) {
@@ -165,25 +165,31 @@ export class RoomEventHandler {
     }
   }
 
-  async handleSendMessage(message: string, callback: (response: TSendMessageToRoomCallbackResponse) => void) {
-
-    if (!this.roomId) return;
+  async handleSendMessage(
+    message: string,
+    roomId: string,
+    callback: (response: TSendMessageToRoomCallbackResponse) => void
+  ): Promise<void> {
     try {
-      const newMessage = await Message.create(this.userId, message, this.roomId);
+      console.log(`Sending message: "${message}" to room: ${roomId}`);
+
+      const newMessage = await Message.create(this.userId, message, roomId);
 
       if (!newMessage) {
-        callback({ success: false, message: "Failed to send message, please try again" });
-        return; // Ensure no further code executes after failure
+        throw new Error('Failed to create message');
       }
 
-      callback({ success: true, message: "Message sent successfully" });
-      this.io.to(this.roomId).emit("new_message", newMessage);
+      console.log('New message created:', newMessage);
+      this.io.to(roomId).emit("new_message", newMessage);
 
+      callback({ success: true, message: "Message sent successfully" });
+      
     } catch (error) {
-      console.error("Error sending message:", error); // Optional: Log the error for debugging
+      console.error("Error sending message:", error);
       callback({ success: false, message: "Failed to send message, please try again" });
     }
   }
+
 
   async getUserJoinedRooms(callback: (response: TGetUserRooms) => void) {
     try {

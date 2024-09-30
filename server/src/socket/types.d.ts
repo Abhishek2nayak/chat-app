@@ -22,7 +22,7 @@ export type TRoomJoinCallbackResponse = {
 export type TRoomLeaveCallbackResponse = TRoomJoinCallbackResponse;
 
 export type TGetRoomMessagesCallbackResponse = Pick<CallbackResponse, "message" | 'success'> & {
-  data: Message[] | null,
+  data: PrismaMessage[] | null,
 }
 
 export type TGetRoomUsersCallbackResponse = Pick<CallbackResponse, "message" | 'success'> & {

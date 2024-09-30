@@ -10,7 +10,7 @@ export type TMessageProps = {
 
 export type TMessagesCallbackResponse = {
     success: boolean,
-    messages: TMessage[],
+    data: TMessage[],
     error: string | null
 }
 

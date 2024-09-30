@@ -72,7 +72,7 @@ export class Message {
     }
 
     // Static method to find messages by room ID
-    static async getRoomMessages(roomId: string): Promise<Message[]> {
+    static async getRoomMessages(roomId: string): Promise<PrismaMessage[]> {
         if (!roomId) {
             throw new Error('Invalid input: roomId is required.');
         }
@@ -80,10 +80,11 @@ export class Message {
         try {
             const messages: PrismaMessage[] = await prisma.message.findMany({
                 where: { roomId },
+                include : {sender : true},
                 orderBy: { timestamp: 'asc' }
             });
 
-            return this.adaptMessages(messages);
+            return messages;
         } catch (error) {
             console.error('Error finding messages by room ID:', error);
             throw new Error('Failed to find messages by room ID.');

@@ -10,8 +10,8 @@ export type IUser = {
 }
 
 
-const useJoinRoom = (initialRoomId: string | null) => {
-    const [roomId, setRoomId] = useState<string | null>(initialRoomId)
+const useJoinRoom = (initialRoomId: string | null | undefined) => {
+    const [roomId, setRoomId] = useState<string | null | undefined>(initialRoomId)
     const socket = useContext(SocketContext)
     const [users, setUsers] = useState<IUser[]>([]);
     
