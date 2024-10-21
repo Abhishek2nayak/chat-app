@@ -10,9 +10,8 @@ export default function useRoomMessage(roomId: string | undefined, socket: TSock
     const [error, setError] = useState<string | null>(null);
     useEffect(() => {
         if (!socket || !roomId) return;
-        setLoading(true);
-        console.log("_______")
-        socket?.emit("get_room_messages", roomId, (response: TMessagesCallbackResponse) => {
+        setMessages([]);
+        setLoading(true);        socket?.emit("get_room_messages", roomId, (response: TMessagesCallbackResponse) => {
             console.log(response,"--<<<<<<<")
             setLoading(false);
             if (response.success) {

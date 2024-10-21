@@ -20,6 +20,8 @@ export const RoomLoaderSkeleton = () => {
 
 const RoomPanel = ({ socket }: TRoomPanelProps) => {
     const { userRooms, loading, error } = useUserJoinedRoom(socket);
+
+    console.log(userRooms)
     const [rooms, setRooms] = useState<RoomState[]>([]);
 
     useEffect(() => {

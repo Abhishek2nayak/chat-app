@@ -37,7 +37,7 @@ export default function Home() {
             return;
         }
 
-        socket.emit("join_room", { roomId }, (response: { success: boolean; message?: string }) => {
+        socket.emit("join_room", roomId, (response: { success: boolean; message?: string }) => {
             if (!response.success) {
                 console.error("Join room error:", response.message);
             } else {
@@ -63,8 +63,8 @@ export default function Home() {
     return (
         <div className="flex justify-center p-6">
             <div className="w-[80vw]">
-            <NavLink className="btn btn-primary mb-5 float-right"
-                to={'/room'}>Go to Chat Room</NavLink>
+                <NavLink className="btn btn-primary mb-5 float-right"
+                    to={'/room'}>Go to Chat Room</NavLink>
                 {error && <Alert type="error" message={error} />}
                 <div className="available-rooms-wrapper">
                     <h1 className="text-3xl font-bold">Search Rooms</h1>
